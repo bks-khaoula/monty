@@ -1,37 +1,53 @@
 #include "monty.h"
-/**
- * f_push - add node to the stack
- * @head: stack head
- * @counter: line_number
- * Return: no return
-*/
-void f_push(stack_t **head, unsigned int counter)
-{
-	int n, j = 0, flag = 0;
 
-	if (bus.arg)
+/**
+ * push - pushes an element to the stack.
+ * @stack: the stack
+ * @line_number: the current line number
+ *
+ * Return: void
+ */
+void push(stack_t **stack, unsigned int line_number)
+{
+	stack_t *new, *tmp;
+	char *push_arg = strtok(NULL, "\n \t");
+	int pVal;
+	/*if push, tests if the push_arg was valid or not */
+	if (!is_int(push_arg))
 	{
-		if (bus.arg[0] == '-')
-			j++;
-		for (; bus.arg[j] != '\0'; j++)
-		{
-			if (bus.arg[j] > 57 || bus.arg[j] < 48)
-				flag = 1; }
-		if (flag == 1)
-		{ fprintf(stderr, "L%d: usage: push integer\n", counter);
-			fclose(bus.file);
-			free(bus.content);
-			free_stack(*head);
-			exit(EXIT_FAILURE); }}
+		fprintf(stdout, "L%u: usage: push integer\n", line_number);
+		exit(EXIT_FAILURE);
+	}
+
+
+	pVal = atoi(push_arg);
+	new = malloc(sizeof(stack_t));
+	if (new == NULL)
+	{
+		fprintf(stdout, "Error: malloc failed\n");
+		exit(EXIT_FAILURE);
+	}
+	new->n = pVal;
+	new->prev = NULL;
+	new->next = NULL;
+	/** checks if stack is empty **/
+	if ((*stack) == NULL)
+		*stack = new;
+	else if (SQ)
+	{
+		/** puts new node on top if not empty **/
+		(*stack)->prev = new;
+		new->next = *stack;
+		*stack = new;
+	}
 	else
-	{ fprintf(stderr, "L%d: usage: push integer\n", counter);
-		fclose(bus.file);
-		free(bus.content);
-		free_stack(*head);
-		exit(EXIT_FAILURE); }
-	n = atoi(bus.arg);
-	if (bus.lifi == 0)
-		addnode(head, n);
-	else
-		addqueue(head, n);
+	{
+		/**puts new node on the bottom **/
+		tmp = *stack;
+		while (tmp->next != NULL)
+			tmp = tmp->next;
+		tmp->next = new;
+		new->prev = tmp;
+	}
+
 }
